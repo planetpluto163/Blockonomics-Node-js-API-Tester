@@ -21,7 +21,7 @@ Step 3: Add wallets. (on Blockonomic.co)
 
 Step 4: Create your store. (on Blockonomic.co)
 
-Step 5: Installing your project dependencies in Visual Studio Code on your local machine. (Use: package.json)
+Step 5: Installing your project dependencies in Visual Studio Code on your local machine. (Use: package.json) (https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/package.json)
 
 Step 6: Create a .env file to store our Blockonomics API key and callback settings. (Use: .env.example)
 
