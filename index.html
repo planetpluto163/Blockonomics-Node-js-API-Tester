@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto Checkout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    .info {
+      margin-bottom: 1rem;
+    }
+    .btc {
+      font-weight: bold;
+      color: #ff9900;
+    }
+    .address {
+      font-family: monospace;
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    .status {
+      font-weight: bold;
+      color: green;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Select Payment Method</h2>
+    <div class="btn-group">
+      <button onclick="loadBTC()">Pay with BTC</button>
+      <button onclick="loadUSDT()">Pay with USDT</button>
+    </div>
+
+    <div id="btc-checkout" class="hidden">
+      <h3>Bitcoin (BTC) Checkout</h3>
+      <div id="btc-info"><p>Loading BTC checkout...</p></div>
+    </div>
+
+    <div id="usdt-checkout" class="hidden">
+      <h3>USDT (ETH ERC-20) Checkout</h3>
+      <div id="usdt-info"><p>Loading USDT checkout...</p></div>
+    </div>
+  </div>
+
+  <!-- Web3 USDT Component -->
+  <script src="https://blockonomics.co/js/web3-payment.js"></script>
+
+  <script>
+    function pollPaymentStatus(address) {
+      const interval = setInterval(() => {
+        fetch(`/payment-status?address=${address}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 0 || data.status === 2) {
+              clearInterval(interval);
+              document.getElementById('payment-status').innerHTML = `
+                <div class="status">✅ Payment received!</div>
+                Amount: ${(data.value / 100000000).toFixed(8)} BTC<br>
+                TXID: ${data.txid}
+              `;
+            }
+          });
+      }, 5000);
+    }
+
+    function loadBTC() {
+      document.getElementById('btc-checkout').classList.remove('hidden');
+      document.getElementById('usdt-checkout').classList.add('hidden');
+
+      fetch('/checkout')
+        .then(res => {
+          if (!res.ok) throw new Error('BTC checkout failed');
+          return res.json();
+        })
+        .then(data => {
+          document.getElementById('btc-info').innerHTML = `
+            <div class="info">🛍️ Product: <strong>${data.product}</strong></div>
+            <div class="info">💵 Price (USD): $${data.priceUSD}</div>
+            <div class="info">₿ BTC Amount: <span class="btc">${data.btcAmount}</span></div>
+            <div class="info">📬 BTC Address:</div>
+            <div class="address">${data.btcAddress}</div>
+            <div id="payment-status" class="info">⏳ Waiting for payment...</div>
+          `;
+
+          const ws = new WebSocket(`wss://www.blockonomics.co/payment/${data.btcAddress}`);
+
+          ws.onmessage = function (event) {
+            const tx = JSON.parse(event.data);
+            if (tx.status === 0 || tx.status === 2) {
+              document.getElementById('payment-status').innerHTML = `
+                <div class="status">✅ Payment received!</div>
+                Amount: ${(tx.value / 100000000).toFixed(8)} BTC<br>
+                TXID: ${tx.txid}
+              `;
+            }
+          };
+
+          pollPaymentStatus(data.btcAddress);
+        })
+        .catch(err => {
+          document.getElementById('btc-info').innerHTML = `
+            <p class="error">❌ Error loading BTC checkout: ${err.message}</p>
+          `;
+        });
+    }
+
+    function loadUSDT() {
+      document.getElementById('usdt-checkout').classList.remove('hidden');
+      document.getElementById('btc-checkout').classList.add('hidden');
+
+      fetch('/checkout-usdt')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('usdt-info').innerHTML = `
+            <div class="info">🛍️ Product: <strong>${data.product}</strong></div>
+            <div class="info">💵 Price (USD): $${data.priceUSD}</div>
+            <div class="info">💸 USDT Amount: <strong>${data.usdtAmount}</strong></div>
+            <div class="info">📬 USDT Address:</div>
+            <div class="address">${data.usdtAddress}</div>
+            <web3-payment
+              order_amount="${data.usdtAmount}"
+              receive_address="${data.usdtAddress}"
+              redirect_url="/confirmation.html?txhash="
+              testnet="1"
+            ></web3-payment>
+          `;
+        })
+        .catch(err => {
+          document.getElementById('usdt-info').innerHTML = `
+            <p class="error">❌ Error loading USDT checkout: ${err.message}</p>
+          `;
+        });
+    }
+  </script>
+</body>
+</html>
