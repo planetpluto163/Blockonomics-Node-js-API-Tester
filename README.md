@@ -23,7 +23,7 @@ Step 4: Create your store. (on Blockonomic.co)
 
 Step 5: Installing your project dependencies in Visual Studio Code on your local machine. (Use: package.json) (https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/package.json)
 
-Step 6: Create a .env file to store our Blockonomics API key and callback settings. (Use: .env.example)
+Step 6: Create a .env file to store our Blockonomics API key and callback settings. (Use: .env.example) (https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/.env)
 
 Step 7: Building the Backend in index.js for BTC Address Generation, Live Price Fetching & Transaction Monitoring. (Use: index.js)
 
