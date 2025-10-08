@@ -29,6 +29,7 @@ Step 7: Building the Backend in index.js for BTC Address Generation, Live Price 
 (https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/index.js)
 
 Step 8: Build your Crypto Checkout Page with BTC & USDT Options locally. (Use: index.html)
+(https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/index.html)
 
 Step 9: Build Your USDT Payment Confirmation Page. (Use: confirmation.html)
 
