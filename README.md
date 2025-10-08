@@ -26,6 +26,7 @@ Step 5: Installing your project dependencies in Visual Studio Code on your local
 Step 6: Create a .env file to store our Blockonomics API key and callback settings. (Use: .env.example) (https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/.env)
 
 Step 7: Building the Backend in index.js for BTC Address Generation, Live Price Fetching & Transaction Monitoring. (Use: index.js)
+(https://github.com/planetpluto163/Blockonomics-Node-js-API-Tester/blob/main/index.js)
 
 Step 8: Build your Crypto Checkout Page with BTC & USDT Options locally. (Use: index.html)
 
