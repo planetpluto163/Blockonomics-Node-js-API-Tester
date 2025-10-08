@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: green;
+    }
+    .hash {
+      font-family: monospace;
+      background: #eee;
+      padding: 1rem;
+      border-radius: 4px;
+      word-break: break-word;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>✅ USDT Payment Received</h2>
+    <p>Transaction Hash:</p>
+    <div id="txhash" class="hash">Waiting for transaction hash...</div>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      const txhashBox = document.getElementById('txhash');
+      const statusBox = document.getElementById('status');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const allTxHashes = urlParams.getAll('txhash');
+
+      // Pick the last valid txhash from the list
+      const txhash = allTxHashes.reverse().find(h => h && h.startsWith('0x') && h.length >= 10);
+
+      console.log('Full URL:', window.location.href);
+      console.log('All txhash values:', allTxHashes);
+      console.log('Selected txhash:', txhash);
+
+      if (txhash) {
+        txhashBox.textContent = txhash;
+
+        fetch('/monitor-usdt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ txhash })
+        })
+        .then(() => {
+          statusBox.textContent = '✅ Monitoring started for this transaction.';
+        })
+        .catch(err => {
+          statusBox.innerHTML = `<div class="error">❌ Failed to monitor transaction: ${err.message}</div>`;
+        });
+      } else {
+        txhashBox.textContent = '❌ Transaction hash not found.';
+      }
+    });
+  </script>
+</body>
+</html>
